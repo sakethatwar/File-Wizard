@@ -32,6 +32,7 @@ C#	/	WPF	guidelines
 
 
 Summary
+
 The	prototype	is	a	simple	3-stage	wizard-style	interface,	which	allows	the	user	to	
 type	or	pick	a	local	folder	and	have	that	folder	scanned	for	files,	which	they	can	
 then	filter	&	refresh,	perform	some	context-menu	actions	on,	and	then	finally	

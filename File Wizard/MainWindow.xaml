@@ -1,0 +1,193 @@
+﻿<Window x:Class="File_Wizard.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="File Wizard" Height="200" Width="525" MinWidth="525" MinHeight="200" 
+        xmlns:local="clr-namespace:File_Wizard" Icon="1394184495_432.ico">
+
+    <Window.DataContext>
+        <local:MainWindowViewModel />
+    </Window.DataContext>
+
+    <Window.Resources>
+        <Style x:Key="RoundedButton" TargetType="{x:Type Button}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border  x:Name="border"
+                            CornerRadius="3" 
+                            BorderThickness="1" 
+                            BorderBrush="Gray">
+                            <ContentPresenter x:Name="buttoncontent"
+                                VerticalAlignment="Center"  
+                                HorizontalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#FF4788c8" />
+                                <Setter Property="Foreground" Value="#FF4788c8" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" >
+                                    <Setter.Value>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" >
+                                            <GradientStop Color="#FFFFD190" Offset="0.35"/>
+                                            <GradientStop Color="Orange" Offset="0.95"/>
+                                            <GradientStop Color="#FFFFD190" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="buttoncontent" Property="RenderTransform" >
+                                    <Setter.Value>
+                                        <TranslateTransform Y="1.0" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsDefaulted" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#FF282828" />
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#FF282828" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.7" />
+                                <Setter Property="Foreground" Value="Gray" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="NextContent" TargetType="Button" BasedOn="{StaticResource RoundedButton}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=FileListShow}" Value="true">
+                    <Setter Property="Content" Value="Open" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=FileListShow}"  Value="false">
+                    <Setter Property="Content" Value="Next"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <local:BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
+    </Window.Resources>
+
+    <Grid FocusManager.FocusedElement="{Binding ElementName=folderPath}" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--File browse dialog-->
+        <Grid x:Name="fileDialog" VerticalAlignment="Top" Grid.Row="0" HorizontalAlignment="Left" Width="517" >
+            <TextBox x:Name="folderPath" HorizontalAlignment="Left" Height="26" Margin="26,49,0,0" TextWrapping="Wrap" 
+                     Text="{Binding FolderPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     VerticalAlignment="Top" Width="406" Padding="3" />
+            <Button Content=". . ." HorizontalAlignment="Left" Margin="440,49,0,0" Style="{StaticResource RoundedButton}"
+                    VerticalAlignment="Top" Width="51" Height="26" FontWeight="Bold" Click="OpenFolderBrowserDialog"/>
+            <Label Content="Pick A Directory :" HorizontalAlignment="Left" Margin="26,10,0,0" VerticalAlignment="Top" Width="105"/>
+            <Grid.Resources>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=FileListShow}"  Value="false">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Path=FileListShow}"  Value="true">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Resources>
+        </Grid>
+
+        <!--File List dialog-->
+        <Grid x:Name="fileList"  Grid.Row="1" Margin="1,1,2,2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <DockPanel Margin="0,10,0,10" Grid.Row="0" >
+                <CheckBox Margin="26,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="0" Content="Recursive Directories"
+                          IsChecked="{Binding Path=IncludeSubdirectories,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Border Padding="5" CornerRadius="15" BorderThickness="1" BorderBrush="LightGray" Background="White" Margin="0,0,26,0" 
+                        HorizontalAlignment="Right" VerticalAlignment="Center" >
+                    <TextBox Width="150" Background="Transparent" BorderThickness="0" Grid.Column="2" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" >
+                    </TextBox>
+                </Border>
+            </DockPanel>
+            <DataGrid x:Name="myGrid" Grid.Row="1" ItemsSource="{Binding FileListView}" AutoGenerateColumns="False" IsReadOnly="True" 
+                      SelectedItem="{Binding SelectedFile,Mode=TwoWay}" Margin="1,1,2,2" SelectionUnit="FullRow" 
+                      EnableRowVirtualization="True" EnableColumnVirtualization="True" 
+                      SelectionMode="Extended" VirtualizingPanel.IsVirtualizing="True" SelectionChanged="myGrid_SelectionChanged"
+                      VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.IsContainerVirtualizable="True">
+                
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Filename" Width="*" Binding="{Binding Name}"/>
+                    <DataGridTextColumn Header="Filetype" Width="50" Binding="{Binding FileType}" />
+                    <DataGridTextColumn Header="Filesize (Bytes)" Width="100" Binding="{Binding FileSize}"/>
+                </DataGrid.Columns>
+                <!--<DataGrid.Resources>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay}" />
+                    </Style>
+                </DataGrid.Resources>-->
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Open file in explorer" Command="{Binding OpenInExplorer}"/>
+                        <MenuItem Header="Copy path" Command="{Binding CopyPath}" />
+                        <MenuItem Header="Details" Command="{Binding ShowDetails}" />
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+            </DataGrid>
+            <ProgressBar x:Name="progressBar" IsIndeterminate="True" Grid.Row="2" 
+                         Height="10" Margin="0,10,0,0" Visibility="{Binding Path=ProgressBarVisible, Converter={StaticResource BooleanToVisibility} }" ></ProgressBar>
+            <Grid.Resources>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=FileListShow}"  Value="true">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Path=FileListShow}"  Value="false">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Resources>
+        </Grid>
+
+        <!--button grid-->
+        <Grid x:Name="buttons" VerticalAlignment="Bottom" HorizontalAlignment="Right" Visibility="Visible" Grid.Row="2" Margin="0,10,0,0" >
+            <Button x:Name="nextAction" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="26" Width="75" Margin="0,10,26,10"
+                     Command="{Binding NextCommand}" Style="{StaticResource NextContent}" IsDefault="True" >
+            </Button>
+            <Button x:Name="prevAction" Content="Cancel" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="26" Width="75" Margin="0,0,108,10" 
+                    Style="{StaticResource RoundedButton}" IsCancel="True" Command="{Binding CancelCommand}" >
+            </Button>
+        </Grid>
+        
+        <Popup IsOpen="{Binding ShowPopup}" Placement="Mouse" >
+            <Border Background="Black">
+            <Canvas Height="300" Width="300" Background="White" Margin="2,2,2,2">
+                    <Border Background="Black" Margin="2,2,2,2">
+                        <Image Height="60" Width="60" Source="{Binding IconBitmap}" Margin="2,2,2,2"/>
+                </Border>
+                <TextBox IsReadOnly="True" Canvas.Left="75" BorderThickness="0" TextWrapping="NoWrap"  Text="{Binding Path=SelectedFile.Name}" Canvas.Top="21" Width="207"/>
+                <TextBlock Height="23" TextWrapping="NoWrap" Canvas.Top="78" Width="60" Text="Location :" Canvas.Left="2"/>
+                <TextBox IsReadOnly="True" Canvas.Left="75"  BorderThickness="0" TextWrapping="NoWrap" Text="{Binding Path=SelectedFile.DirectoryName}" Canvas.Top="78" RenderTransformOrigin="-0.04,-0.375" Width="207"/>
+                <TextBlock TextWrapping="Wrap" Text="Size (Bytes) :" Canvas.Top="106" Canvas.Left="2"/>
+                <TextBlock Canvas.Left="75" TextWrapping="NoWrap" Text="{Binding Path=SelectedFile.FileSize}" Canvas.Top="106" Width="207"/>
+                <TextBlock TextWrapping="Wrap" Text="Readonly :" Canvas.Top="136" Canvas.Left="2"/>
+                <CheckBox  Canvas.Left="75" Canvas.Top="137" IsEnabled="False" IsChecked="{Binding Path=SelectedFile.IsReadOnly}"/>
+                <TextBlock TextWrapping="Wrap" Text="Created :" Canvas.Top="166" Canvas.Left="2"/>
+                <TextBlock Canvas.Left="75" TextWrapping="NoWrap" Text="{Binding Path=SelectedFile.CreationTime}" Canvas.Top="166" RenderTransformOrigin="0.22,-0.312" Width="178"/>
+                <TextBlock TextWrapping="Wrap" Text="Modified :" Canvas.Top="194" Canvas.Left="2"/>
+                <TextBlock Canvas.Left="75" TextWrapping="NoWrap" Text="{Binding Path=SelectedFile.ModifiedTime}" Canvas.Top="194" Width="178"/>
+                <TextBlock TextWrapping="Wrap" Text="Accessed :" Canvas.Top="224" Canvas.Left="2"/>
+                <TextBlock Canvas.Left="75" TextWrapping="NoWrap" Text="{Binding Path=SelectedFile.AccessedTime}" Canvas.Top="224" Width="178"/>
+                <Button Content="Close" Canvas.Left="115" Canvas.Top="260" Width="75" Height="26" 
+                        Style="{StaticResource RoundedButton}" Command="{Binding CLosePopup}" />
+            </Canvas>
+            </Border>
+        </Popup>
+    </Grid>
+</Window>

@@ -8,6 +8,7 @@ interface	prototype	as	specified	in	this	document,	using	either	Objective-C	&
 Cocoa	on	Mac,	or	C#	and	WPF	4	(.Net	4.5)	on	Windows.	
 
 The	deliverables	required:
+
 1.  Full	source	code	to	the	prototype,	which	must	be	buildable	on		XCode	5	or	
 Visual	Studio	2012	with	no	additional	libraries
 2.  A	binary	version	of	the	application	packaged	as	a	single	.app	on	Mac	and	a	
@@ -16,6 +17,7 @@ don’t	have	to	build	an	installer	on	Windows,	you	can	assume	.Net	4.5	is
 installed.
 
 General	guidelines
+
 1.  Code	readability	&	robustness	is	encouraged
 2.  No	specific	code	style	is	required	but	be	consistent
 3.  No	3rdparty	libraries	should	be	needed	for	this	task

@@ -1,4 +1,4 @@
-File-Wizard-Atlassian
+File-Wizard
 =====================
 
 

@@ -3,8 +3,7 @@ File-Wizard-Atlassian
 
 
 User	Interface	Prototype
-As	part	of	the	evaluation	process	Atlassian	asks	that	you	complete	a	user	
-interface	prototype	as	specified	in	this	document,	using	either	Objective-C	&	
+using	either	Objective-C	&	
 Cocoa	on	Mac,	or	C#	and	WPF	4	(.Net	4.5)	on	Windows.	
 
 The	deliverables	required:
